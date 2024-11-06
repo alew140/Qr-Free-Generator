@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WiFi QR Generator - Neubrutalist Style</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f0f0f0;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 2rem;
+            border: 3px solid #000;
+            box-shadow: 8px 8px 0 #000;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            color: #000;
+            background-color: #ff6b6b;
+            padding: 1rem;
+            border: 3px solid #000;
+            box-shadow: 5px 5px 0 #000;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.8rem;
+            font-size: 1rem;
+            border: 3px solid #000;
+            background-color: #fff;
+            margin-bottom: 0.5rem;
+        }
+
+        input:focus {
+            outline: none;
+            background-color: #fff700;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        button {
+            background-color: #4af2a1;
+            border: 3px solid #000;
+            padding: 1rem 2rem;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 5px 5px 0 #000;
+            transition: all 0.2s ease;
+        }
+
+        button.print-btn {
+            background-color: #74c7ff;
+        }
+
+        button:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 7px 7px 0 #000;
+        }
+
+        button:active {
+            transform: translate(2px, 2px);
+            box-shadow: 3px 3px 0 #000;
+        }
+
+        #qrcode {
+            margin-top: 2rem;
+            padding: 1rem;
+            background-color: #fff;
+            border: 3px solid #000;
+            box-shadow: 5px 5px 0 #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .input-group select {
+            width: 100%;
+            padding: 0.8rem;
+            font-size: 1rem;
+            border: 3px solid #000;
+            background-color: #fff;
+            margin-bottom: 0.5rem;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23000000%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.4-12.8z%22%2F%3E%3C%2Fsvg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.7rem top 50%;
+            background-size: 0.65rem auto;
+        }
+
+        .print-card {
+            display: none;
+        }
+
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            .print-card, .print-card * {
+                visibility: visible;
+            }
+            .print-card {
+                display: block;
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                padding: 20px;
+            }
+            .print-card .qr-container {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                padding: 20px;
+                border: 3px solid #000;
+                margin: 0 auto;
+                max-width: 400px;
+                background: white;
+            }
+            .print-card h2 {
+                margin-bottom: 10px;
+                font-size: 24px;
+                text-align: center;
+            }
+            .print-card p {
+                margin: 5px 0;
+                font-size: 18px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>WiFi QR Generator</h1>
+        <div class="input-group">
+            <label for="ssid">Network Name (SSID)</label>
+            <input type="text" id="ssid" placeholder="Enter your WiFi name">
+        </div>
+        
+        <div class="input-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" placeholder="Enter your WiFi password">
+        </div>
+
+        <div class="input-group">
+            <label for="encryption">Encryption Type</label>
+            <select id="encryption">
+                <option value="WPA">WPA/WPA2</option>
+                <option value="WEP">WEP</option>
+                <option value="nopass">No Password</option>
+            </select>
+        </div>
+
+        <div class="button-group">
+            <button onclick="generateQR()">Generate QR Code</button>
+            <button class="print-btn" onclick="printQR()">Print QR Card</button>
+        </div>
+        <div id="qrcode"></div>
+    </div>
+
+    <!-- Template for printing -->
+    <div class="print-card">
+        <div class="qr-container">
+            <h2>WiFi Access</h2>
+            <div id="print-qrcode"></div>
+            <p>Network: <span id="print-ssid"></span></p>
+            <p>Password: <span id="print-password"></span></p>
+        </div>
+    </div>
+
+    <script>
+        let qr = null;
+        let printQr = null;
+
+        function generateQR() {
+            const ssid = document.getElementById('ssid').value;
+            const password = document.getElementById('password').value;
+            const encryption = document.getElementById('encryption').value;
+            
+            if (!ssid) {
+                alert('Please enter a network name!');
+                return;
+            }
+
+            const qrContainer = document.getElementById('qrcode');
+            const printQrContainer = document.getElementById('print-qrcode');
+            qrContainer.innerHTML = '';
+            printQrContainer.innerHTML = '';
+
+            const wifiString = `WIFI:T:${encryption};S:${ssid};P:${password};;`;
+
+            // Generate QR for display
+            qr = new QRCode(qrContainer, {
+                text: wifiString,
+                width: 256,
+                height: 256,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+
+            // Generate QR for printing
+            printQr = new QRCode(printQrContainer, {
+                text: wifiString,
+                width: 256,
+                height: 256,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+
+            // Update print template
+            document.getElementById('print-ssid').textContent = ssid;
+            document.getElementById('print-password').textContent = password;
+        }
+
+        function printQR() {
+            if (!qr) {
+                alert('Please generate a QR code first!');
+                return;
+            }
+            window.print();
+        }
+    </script>
+</body>
+</html>
