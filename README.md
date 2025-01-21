@@ -33,4 +33,4 @@ Utilizamos la librería [QRCode.js](https://github.com/davidshimjs/qrcodejs) par
 
 1. Clona el repositorio en tu máquina local:
    ```bash
-   git clone https://github.com/alew140/Qr-Free-Generator/edit/main/README.md
+   git clone https://github.com/alew140/Qr-Free-Generator.git
